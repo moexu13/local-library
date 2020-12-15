@@ -17,25 +17,36 @@ function numberOfBorrows(account, books) {
 
 function getBooksPossessedByAccount(account, books, authors) {
   let possessedBooks = [];
-  books.forEach(book => {
-    let matches = book.borrows.filter(checkout => checkout.id === account.id && checkout.returned === false);
-    if (matches.length) possessedBooks.push(matches);
+  const possessedBooksIds = getIdsForPossessedBooks(books, account.id);
+  possessedBooksIds.forEach(ids => {
+    let book = getBookById(books, ids.bookId);
+    book.author = getAuthorById(authors, ids.authorId);;
+    possessedBooks.push(book);
   });
-  possessedBooks.forEach(book => {
-    console.log("here");
-    let author = getAuthorOfBook(book, authors);
-    console.log(author);
-  })
-  // console.log(possessedBooks);
-  // let bookAuthors = [];
-  // authors.forEach(author => {
-
-  // });
   return possessedBooks;
 }
 
-function getAuthorOfBook(book, authors) {
-  return authors.filter(author => author.id === book.authorId);
+// get the book id and author id to make lookup easier
+function getIdsForPossessedBooks(books, accountId) {
+  let possessedBooksIds = [];
+  let bookAndAuthorIds = {};
+  books.forEach(book => {
+    let matches = book.borrows.filter(borrowed => borrowed.id === accountId && borrowed.returned === false);
+    if (matches.length) {
+      bookAndAuthorIds.bookId = book.id;
+      bookAndAuthorIds.authorId = book.authorId;
+      possessedBooksIds.push(bookAndAuthorIds);
+    }
+  });
+  return possessedBooksIds;
+}
+
+function getBookById(books, bookId) {
+  return books.find(book => book.id === bookId);
+}
+
+function getAuthorById(authors, authorId) {
+  return authors.find(author => author.id === authorId);
 }
 
 module.exports = {
