@@ -1,3 +1,5 @@
+const { buildAuthorName } = require("./books");
+
 function totalBooksCount(books) {
   return books.length;
 }
@@ -13,12 +15,8 @@ function booksBorrowedCount(books) {
     if (book.borrows.length > 0) {
       // if so, the first borrow record contains the current status
       if (!book.borrows[0].returned) count++;
-    } else {
-      // if the book has never been borrowed then it should be in the library
-      // the test numbers don't work though
-      count++;
-    }
-  })
+    } 
+  });
   return count;
 }
 
@@ -51,13 +49,27 @@ function getMostPopularBooks(books) {
 }
 
 function getMostPopularAuthors(books, authors) {
-  let authorIds = [];
-  authors.forEach(author => {
-    console.log(author);
-    authorIds.push(author.id);
+  let bookAuthors = [];
+  books.forEach(book => {
+    let match = bookAuthors.find(author => author.id === book.authorId);
+    if (match) {
+      match.count += book.borrows.length;
+    } else {
+      let name = buildAuthorName(authors, book.authorId);
+      bookAuthors.push({ 
+        id: book.authorId, 
+        name: name,
+        count: book.borrows.length }); 
+    }
   });
-  
-  console.log(authorIds);
+  // return list of authors sorted by total borrows
+  bookAuthors.sort((au1, au2) => au2.count - au1.count);
+  // only return name and count, not id
+  // there's probably a more elegant way to do this though
+  bookAuthors.forEach(author => {
+    delete author.id;
+  });
+  return bookAuthors.slice(0, 5);
 }
 
 module.exports = {
