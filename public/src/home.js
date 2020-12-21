@@ -62,14 +62,10 @@ function getMostPopularAuthors(books, authors) {
         count: book.borrows.length }); 
     }
   });
-  // return list of authors sorted by total borrows
+  // sort author list by total borrows
   bookAuthors.sort((au1, au2) => au2.count - au1.count);
-  // only return name and count, not id
-  // there's probably a more elegant way to do this though
-  bookAuthors.forEach(author => {
-    delete author.id;
-  });
-  return bookAuthors.slice(0, 5);
+  // return top 5
+  return bookAuthors.map(author =>  ({ name: author.name, count: author.count })).slice(0, 5);
 }
 
 module.exports = {

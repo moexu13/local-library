@@ -9,8 +9,9 @@ function sortAccountsByLastName(accounts) {
 function numberOfBorrows(account, books) {
   let borrows = 0;
   books.forEach(book => {
-    let matches = book.borrows.filter(checkout => checkout.id === account.id);
-    borrows += matches.length;
+    borrows += book.borrows.reduce(function(count, borrow) {
+      return count + (borrow.id === account.id);
+    }, 0);
   });
   return borrows;
 }
